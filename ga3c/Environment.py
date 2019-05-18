@@ -31,7 +31,7 @@ else:
     from Queue import Queue
 
 import numpy as np
-import scipy.misc as misc
+import PIL.Image
 
 from Config import Config
 from GameManager import GameManager
@@ -55,7 +55,9 @@ class Environment:
     @staticmethod
     def _preprocess(image):
         image = Environment._rgb2gray(image)
-        image = misc.imresize(image, [Config.IMAGE_HEIGHT, Config.IMAGE_WIDTH], 'bilinear')
+        img = PIL.Image.fromarray( image )
+        img = img.resize( [Config.IMAGE_HEIGHT, Config.IMAGE_WIDTH], resample=PIL.Image.BILINEAR )
+        image = np.array( img )
         image = image.astype(np.float32) / 128.0 - 1.0
         return image
 
