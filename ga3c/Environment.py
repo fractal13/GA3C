@@ -31,7 +31,8 @@ else:
     from Queue import Queue
 
 import numpy as np
-import PIL.Image
+import tensorflow as tf
+import tensorflow.keras as keras
 
 from Config import Config
 from GameManager import GameManager
@@ -53,13 +54,11 @@ class Environment:
         return np.dot(rgb[..., :3], [0.299, 0.587, 0.114])
 
     @staticmethod
-    def _preprocess(image):
-        image = Environment._rgb2gray(image)
-        img = PIL.Image.fromarray( image )
-        img = img.resize( [Config.IMAGE_HEIGHT, Config.IMAGE_WIDTH], resample=PIL.Image.BILINEAR )
-        image = np.array( img )
-        image = image.astype(np.float32) / 128.0 - 1.0
-        return image
+    def _preprocess(x_data):
+        # The input state is a numpy.array of 54 ints.
+        # Categorize into one-hot encoding, to better reflect the data.  Now has 54 * 6 = 324 values.
+        x_data = keras.utils.to_categorical( x_data, num_classes=6 )
+        return x_data
 
     def _get_current_state(self):
         if not self.frame_q.full():

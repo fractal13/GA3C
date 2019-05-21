@@ -30,7 +30,8 @@ class Config:
     # Game configuration
 
     # Name of the game, with version (e.g. PongDeterministic-v0)
-    ATARI_GAME = 'PongDeterministic-v0'
+    #ATARI_GAME = 'PongDeterministic-v0'
+    ATARI_GAME = 'rubiks-v0'
 
     # Enable to see the trained agent in action
     PLAY_MODE = False
@@ -75,12 +76,13 @@ class Config:
 
     # Max size of the queue
     MAX_QUEUE_SIZE = 100
-    PREDICTION_BATCH_SIZE = 128
+    #PREDICTION_BATCH_SIZE = 128
+    PREDICTION_BATCH_SIZE = 10
 
     # Input of the DNN
-    STACKED_FRAMES = 4
-    IMAGE_WIDTH = 84
-    IMAGE_HEIGHT = 84
+    STACKED_FRAMES = 1
+    IMAGE_WIDTH = 6
+    IMAGE_HEIGHT = 54
 
     # Total number of episodes and annealing frequency
     EPISODES = 400000
