@@ -29,11 +29,11 @@ import gym_rubiks
 
 
 class GameManager:
-    def __init__(self, game_name, display):
+    def __init__(self, game_name, display, **kwargs):
         self.game_name = game_name
         self.display = display
 
-        self.env = gym.make(game_name)
+        self.env = gym.make(game_name, **kwargs)
         self.reset()
 
     def reset(self):

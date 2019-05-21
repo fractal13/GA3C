@@ -32,6 +32,10 @@ class Config:
     # Name of the game, with version (e.g. PongDeterministic-v0)
     #ATARI_GAME = 'PongDeterministic-v0'
     ATARI_GAME = 'rubiks-v0'
+    #ENV_KWARGS = { count_mode='product', count_factor=1.01 }
+    # increase number of possible steps every factor of 20 episodes
+    # 1, 20, 400, 8000, 160000, ...
+    ENV_KWARGS = { 'count_mode': 'log', 'count_factor': 20 } 
 
     # Enable to see the trained agent in action
     PLAY_MODE = False
@@ -71,13 +75,13 @@ class Config:
     TIME_MAX = 5
     
     # Reward Clipping
-    REWARD_MIN = -1
-    REWARD_MAX = 1
+    REWARD_MIN = -1.0
+    REWARD_MAX = 1.0
 
     # Max size of the queue
     MAX_QUEUE_SIZE = 100
-    #PREDICTION_BATCH_SIZE = 128
-    PREDICTION_BATCH_SIZE = 10
+    PREDICTION_BATCH_SIZE = 128
+    #PREDICTION_BATCH_SIZE = 10
 
     # Input of the DNN
     STACKED_FRAMES = 1
