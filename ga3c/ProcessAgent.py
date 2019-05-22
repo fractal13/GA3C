@@ -56,11 +56,11 @@ class ProcessAgent(Process):
     @staticmethod
     def _accumulate_rewards(experiences, discount_factor, terminal_reward):
         reward_sum = terminal_reward
-        for t in reversed(range(0, len(experiences))):
+        for t in reversed(range(0, len(experiences)-1)):
             r = np.clip(experiences[t].reward, Config.REWARD_MIN, Config.REWARD_MAX)
             reward_sum = discount_factor * reward_sum + r
             experiences[t].reward = reward_sum
-        return experiences[:]
+        return experiences[:-1]
 
     def convert_data(self, experiences):
         x_ = np.array([exp.state for exp in experiences])
@@ -93,6 +93,7 @@ class ProcessAgent(Process):
         while not done:
             # very first few frames
             if self.env.current_state is None:
+                # this may be correct for the ATARI worlds but not for others
                 self.env.step(0)  # 0 == NOOP
                 continue
 
@@ -106,9 +107,10 @@ class ProcessAgent(Process):
             if done or time_count == Config.TIME_MAX:
                 terminal_reward = 0 if done else value
 
-                updated_exps = ProcessAgent._accumulate_rewards(experiences, self.discount_factor, terminal_reward)
-                if len( experiences ) != len( updated_exps ):
-                    print( "Oops:", len( experiences ), len( updated_exps ) )
+                if len( experiences ) == 1:
+                    updated_exps = experiences[ : ]
+                else:
+                    updated_exps = ProcessAgent._accumulate_rewards(experiences, self.discount_factor, terminal_reward)
                 x_, r_, a_ = self.convert_data(updated_exps)
                 yield x_, r_, a_, reward_sum
 
