@@ -75,22 +75,26 @@ class NetworkVP:
 
         self.global_step = tf.Variable(0, trainable=False, name='step')
 
-        # As implemented in A3C paper
-        self.n1 = self.conv2d_layer(self.x, 8, 16, 'conv11', strides=[1, 4, 4, 1])
-        self.n2 = self.conv2d_layer(self.n1, 4, 32, 'conv12', strides=[1, 2, 2, 1])
         self.action_index = tf.placeholder(tf.float32, [None, self.num_actions])
-        _input = self.n2
+        _input = self.x
 
         flatten_input_shape = _input.get_shape()
         nb_elements = flatten_input_shape[1] * flatten_input_shape[2] * flatten_input_shape[3]
 
         self.flat = tf.reshape(_input, shape=[-1, nb_elements._value])
-        self.d1 = self.dense_layer(self.flat, 256, 'dense1')
+        self.d1 = self.dense_layer(self.flat, 256, 'dense1', func=tf.nn.softsign)
+        self.d2 = self.dense_layer(self.d1, 256, 'dense2', func=tf.nn.softsign)
+        self.d3 = self.dense_layer(self.d2, 256, 'dense3', func=tf.nn.softsign)
+        self.d4 = self.dense_layer(self.d3, 256, 'dense4', func=tf.nn.softsign)
+        self.d5 = self.dense_layer(self.d4, 256, 'dense5', func=tf.nn.softsign)
+        self.d6 = self.dense_layer(self.d5, 256, 'dense6', func=tf.nn.softsign)
+        self.d7 = self.dense_layer(self.d6, 256, 'dense7', func=tf.nn.softsign)
+        self.d8 = self.dense_layer(self.d7, 256, 'dense8', func=tf.nn.softsign)
 
-        self.logits_v = tf.squeeze(self.dense_layer(self.d1, 1, 'logits_v', func=None), axis=[1])
+        self.logits_v = tf.squeeze(self.dense_layer(self.d8, 1, 'logits_v', func=None), axis=[1])
         self.cost_v = 0.5 * tf.reduce_sum(tf.square(self.y_r - self.logits_v), axis=0)
 
-        self.logits_p = self.dense_layer(self.d1, self.num_actions, 'logits_p', func=None)
+        self.logits_p = self.dense_layer(self.d8, self.num_actions, 'logits_p', func=None)
         if Config.USE_LOG_SOFTMAX:
             self.softmax_p = tf.nn.softmax(self.logits_p)
             self.log_softmax_p = tf.nn.log_softmax(self.logits_p)

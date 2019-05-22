@@ -35,7 +35,8 @@ class Config:
     #ENV_KWARGS = { count_mode='product', count_factor=1.01 }
     # increase number of possible steps every factor of 20 episodes
     # 1, 20, 400, 8000, 160000, ...
-    ENV_KWARGS = { 'count_mode': 'log', 'count_factor': 20 } 
+    #ENV_KWARGS = { 'count_mode': 'log', 'count_factor': 20 } 
+    ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': 1 } 
 
     # Enable to see the trained agent in action
     PLAY_MODE = False
@@ -72,7 +73,7 @@ class Config:
     DISCOUNT = 0.99
     
     # Tmax
-    TIME_MAX = 5
+    TIME_MAX = 200
     
     # Reward Clipping
     REWARD_MIN = -1.0
@@ -127,10 +128,10 @@ class Config:
     # Enable to save models every SAVE_FREQUENCY episodes
     SAVE_MODELS = True
     # Save every SAVE_FREQUENCY episodes
-    SAVE_FREQUENCY = 1000
+    SAVE_FREQUENCY = 10000
     
     # Print stats every PRINT_STATS_FREQUENCY episodes
-    PRINT_STATS_FREQUENCY = 1
+    PRINT_STATS_FREQUENCY = 100
     # The window to average stats
     STAT_ROLLING_MEAN_WINDOW = 1000
 
