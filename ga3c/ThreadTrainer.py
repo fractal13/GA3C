@@ -25,6 +25,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from threading import Thread
+import sys
+if sys.version_info >= (3,0):
+    from queue import Queue as queueQueue
+    from queue import Empty as queueEmpty
+else:
+    from Queue import Queue as queueQueue
+    from Queue import Empty as queueEmpty
 import numpy as np
 
 from Config import Config
@@ -43,7 +50,11 @@ class ThreadTrainer(Thread):
         while not self.exit_flag:
             batch_size = 0
             while batch_size <= Config.TRAINING_MIN_BATCH_SIZE:
-                x_, r_, a_ = self.server.training_q.get()
+                # allow to exit if nothing is in the queue, and we have been terminated.
+                try:
+                    x_, r_, a_ = self.server.training_q.get( block=True, timeout=1 )
+                except queueEmpty:
+                    break
                 if batch_size == 0:
                     x__ = x_; r__ = r_; a__ = a_
                 else:
@@ -52,5 +63,7 @@ class ThreadTrainer(Thread):
                     a__ = np.concatenate((a__, a_))
                 batch_size += x_.shape[0]
             
-            if Config.TRAIN_MODELS:
+            if Config.TRAIN_MODELS and batch_size > 0:
                 self.server.train_model(x__, r__, a__, self.id)
+        print( "ThreadTrainer finished" )
+        return

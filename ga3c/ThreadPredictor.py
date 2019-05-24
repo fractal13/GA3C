@@ -25,6 +25,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from threading import Thread
+import sys
+if sys.version_info >= (3,0):
+    from queue import Queue as queueQueue
+    from queue import Empty as queueEmpty
+else:
+    from Queue import Queue as queueQueue
+    from Queue import Empty as queueEmpty
 
 import numpy as np
 
@@ -47,7 +54,11 @@ class ThreadPredictor(Thread):
             dtype=np.float32)
 
         while not self.exit_flag:
-            ids[0], states[0] = self.server.prediction_q.get()
+            # allow to exit if nothing is in the queue, and we have been terminated.
+            try:
+                ids[0], states[0] = self.server.prediction_q.get( block=True, timeout=1 )
+            except queueEmpty:
+                continue
 
             size = 1
             while size < Config.PREDICTION_BATCH_SIZE and not self.server.prediction_q.empty():
@@ -60,3 +71,6 @@ class ThreadPredictor(Thread):
             for i in range(size):
                 if ids[i] < len(self.server.agents):
                     self.server.agents[ids[i]].wait_q.put((p[i], v[i]))
+                    
+        print( "ThreadPredictor finished" )
+        return

@@ -27,8 +27,10 @@
 import sys
 if sys.version_info >= (3,0):
     from queue import Queue as queueQueue
+    from queue import Empty as queueEmpty
 else:
     from Queue import Queue as queueQueue
+    from Queue import Empty as queueEmpty
 
 from datetime import datetime
 from multiprocessing import Process, Queue, Value
@@ -50,6 +52,8 @@ class ProcessStats(Process):
         self.predictor_count = Value('i', 0)
         self.agent_count = Value('i', 0)
         self.total_frame_count = 0
+        self.rolling_reward_average = Value('d', 0)
+        self.exit_flag = Value('i', 0)
 
     def FPS(self):
         # average FPS from the beginning of the training (not current FPS)
@@ -67,8 +71,13 @@ class ProcessStats(Process):
             
             self.start_time = time.time()
             first_time = datetime.now()
-            while True:
-                episode_time, reward, length = self.episode_log_q.get()
+            while self.exit_flag.value == 0:
+                # allow to exit if nothing is in the queue, and we have been terminated.
+                try:
+                    episode_time, reward, length = self.episode_log_q.get( block=True, timeout=1 )
+                except queueEmpty:
+                    print( "episode_log_q empty" )
+                    continue
                 results_logger.write('%s %10.4f %d\n' % (episode_time.strftime("%Y-%m-%d %H:%M:%S"), reward, length))
                 results_logger.flush()
 
@@ -77,6 +86,9 @@ class ProcessStats(Process):
 
                 rolling_frame_count += length
                 rolling_reward += reward
+
+                if results_q.qsize() == Config.STAT_ROLLING_MEAN_WINDOW:
+                    self.rolling_reward_average.value = rolling_reward / results_q.qsize()
 
                 if results_q.full():
                     old_episode_time, old_reward, old_length = results_q.get()
@@ -103,3 +115,6 @@ class ProcessStats(Process):
                            self.FPS(), self.TPS(),
                            self.trainer_count.value, self.predictor_count.value, self.agent_count.value))
                     sys.stdout.flush()
+                    
+            print( "ProcessStats finished", self.exit_flag.value )
+        return

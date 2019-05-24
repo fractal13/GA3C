@@ -37,13 +37,16 @@ class Config:
     # 1, 20, 400, 8000, 160000, ...
     #ENV_KWARGS = { 'count_mode': 'log', 'count_factor': 20 } 
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': 1 } 
+    MAX_SHUFFLE = 2
+    MAX_STEPS = 4
+    ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': MAX_SHUFFLE, 'max_steps': MAX_STEPS } 
 
     # Enable to see the trained agent in action
     PLAY_MODE = False
     # Enable to train
     TRAIN_MODELS = True
     # Load old models. Throws if the model doesn't exist
-    LOAD_CHECKPOINT = False
+    LOAD_CHECKPOINT = True
     # If 0, the latest checkpoint is loaded
     LOAD_EPISODE = 0 
 
@@ -73,7 +76,7 @@ class Config:
     DISCOUNT = 0.99
     
     # Tmax
-    TIME_MAX = 200
+    TIME_MAX = 5
     
     # Reward Clipping
     REWARD_MIN = -1.0
@@ -90,8 +93,10 @@ class Config:
     IMAGE_HEIGHT = 54
 
     # Total number of episodes and annealing frequency
-    EPISODES = 400000
-    ANNEALING_EPISODE_COUNT = 400000
+    EPISODES = 11*400000
+    ANNEALING_EPISODE_COUNT = 11*400000
+    # Stop early if the rolling reward average reaches this level.
+    STOPPING_REWARD = 1.0 - ( (MAX_SHUFFLE-1) / MAX_STEPS )
 
     # Entropy regualrization hyper-parameter
     BETA_START = 0.01
@@ -131,9 +136,9 @@ class Config:
     SAVE_FREQUENCY = 10000
     
     # Print stats every PRINT_STATS_FREQUENCY episodes
-    PRINT_STATS_FREQUENCY = 100
+    PRINT_STATS_FREQUENCY = 1000
     # The window to average stats
-    STAT_ROLLING_MEAN_WINDOW = 1000
+    STAT_ROLLING_MEAN_WINDOW = 10000
 
     # Results filename
     RESULTS_FILENAME = 'results.txt'

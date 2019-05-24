@@ -111,7 +111,7 @@ class Server:
                                        Config.LEARNING_RATE_END - Config.LEARNING_RATE_START) / Config.ANNEALING_EPISODE_COUNT
         beta_multiplier = (Config.BETA_END - Config.BETA_START) / Config.ANNEALING_EPISODE_COUNT
 
-        while self.stats.episode_count.value < Config.EPISODES:
+        while ( self.stats.episode_count.value < Config.EPISODES ) and ( self.stats.rolling_reward_average.value < Config.STOPPING_REWARD ):
             step = min(self.stats.episode_count.value, Config.ANNEALING_EPISODE_COUNT - 1)
             self.model.learning_rate = Config.LEARNING_RATE_START + learning_rate_multiplier * step
             self.model.beta = Config.BETA_START + beta_multiplier * step
@@ -122,11 +122,26 @@ class Server:
                 self.stats.should_save_model.value = 0
 
             time.sleep(0.01)
-
+            
+        print( "Server finished finished with episode_count: " + str( self.stats.episode_count.value )
+               + "/" + str( Config.EPISODES) + "  reward: " + str (self.stats.rolling_reward_average.value )
+               + "/" + str( Config.STOPPING_REWARD ) )
+            
         self.dynamic_adjustment.exit_flag = True
+        self.dynamic_adjustment.join( )
+        
         while self.agents:
             self.remove_agent()
         while self.predictors:
             self.remove_predictor()
         while self.trainers:
             self.remove_trainer()
+            
+        self.stats.exit_flag.value = 1
+        self.stats.join( )
+        
+        print( "Server finished finished with episode_count: " + str( self.stats.episode_count.value )
+               + "/" + str( Config.EPISODES) + "  reward: " + str (self.stats.rolling_reward_average.value )
+               + "/" + str( Config.STOPPING_REWARD ) )
+        return
+    
