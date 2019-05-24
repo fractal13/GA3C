@@ -24,6 +24,34 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+def stopping_reward_aux( max_shuffle, step_penalty=-(1./30.), finish_reward=1.0 ):
+    total = 0.0
+    p0 = 1./max_shuffle
+    leaf_count = 1.0
+    branch_count = 12.0
+
+    # calculate the total number of nodes up to level max_shuffle
+    total_leaves = 0.0
+    for i in range( 1, max_shuffle+1 ):
+        leaf_count = leaf_count * branch_count
+        total_leaves += leaf_count
+
+    # probability for a level is node count for the leave over total number of nodes
+    leaf_count = 1.0
+    for i in range( 1, max_shuffle+1 ):
+        leaf_count = leaf_count * branch_count
+        p1 = leaf_count / total_leaves
+        total += p1 * (i-1) * step_penalty
+    total += finish_reward
+    return total
+
+def stopping_reward( max_shuffle, step_penalty=-(1./30.), finish_reward=1.0 ):
+    total = 0.0
+    p0 = 1./max_shuffle
+    for i in range( 1, max_shuffle+1 ):
+        total += p0 * stopping_reward_aux( i, step_penalty, finish_reward )
+    return total
+
 class Config:
 
     #########################################################################
@@ -37,7 +65,7 @@ class Config:
     # 1, 20, 400, 8000, 160000, ...
     #ENV_KWARGS = { 'count_mode': 'log', 'count_factor': 20 } 
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': 1 } 
-    MAX_SHUFFLE = 1
+    MAX_SHUFFLE = 15
     MAX_STEPS = min( MAX_SHUFFLE+1, 26 )
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': MAX_SHUFFLE, 'max_steps': MAX_STEPS } 
 
@@ -99,7 +127,7 @@ class Config:
     EPISODES = 20*400000
     ANNEALING_EPISODE_COUNT = 20*400000
     # Stop early if the rolling reward average reaches this level.
-    STOPPING_REWARD = 1.0 - ( (MAX_SHUFFLE-1) / 30. )
+    STOPPING_REWARD = stopping_reward( MAX_SHUFFLE, step_penalty=-(1./30.), finish_reward=1.0 )
 
     # Entropy regualrization hyper-parameter
     BETA_START = 0.01
