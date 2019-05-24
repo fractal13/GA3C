@@ -140,6 +140,10 @@ class Server:
         self.stats.exit_flag.value = 1
         self.stats.join( )
         
+        if Config.SAVE_MODELS:
+            print( "Saving Model" )
+            self.save_model()
+
         print( "Server finished finished with episode_count: " + str( self.stats.episode_count.value )
                + "/" + str( Config.EPISODES) + "  reward: " + str (self.stats.rolling_reward_average.value )
                + "/" + str( Config.STOPPING_REWARD ) )
