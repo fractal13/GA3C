@@ -82,19 +82,17 @@ class NetworkVP:
         nb_elements = flatten_input_shape[1] * flatten_input_shape[2] * flatten_input_shape[3]
 
         self.flat = tf.reshape(_input, shape=[-1, nb_elements._value])
-        self.d1 = self.dense_layer(self.flat, 256, 'dense1', func=tf.nn.softsign, initializer="glorot_normal")
-        self.d2 = self.dense_layer(self.d1, 256, 'dense2', func=tf.nn.softsign, initializer="glorot_normal")
-        self.d3 = self.dense_layer(self.d2, 256, 'dense3', func=tf.nn.softsign, initializer="glorot_normal")
-        self.d4 = self.dense_layer(self.d3, 256, 'dense4', func=tf.nn.softsign, initializer="glorot_normal")
-        self.d5 = self.dense_layer(self.d4, 256, 'dense5', func=tf.nn.softsign, initializer="glorot_normal")
-        self.d6 = self.dense_layer(self.d5, 256, 'dense6', func=tf.nn.softsign, initializer="glorot_normal")
-        self.d7 = self.dense_layer(self.d6, 256, 'dense7', func=tf.nn.softsign, initializer="glorot_normal")
-        self.d8 = self.dense_layer(self.d7, 256, 'dense8', func=tf.nn.softsign, initializer="glorot_normal")
 
-        self.logits_v = tf.squeeze(self.dense_layer(self.d8, 1, 'logits_v', func=None), axis=[1])
+        d = self.flat
+        self.dense_layers = [ ]
+        for i in range( Config.NUMBER_OF_DENSE_LAYERS ):
+            d = self.dense_layer(d, Config.NUMBER_OF_DENSE_NODES, 'dense'+str(i+1), func=tf.nn.softsign, initializer="glorot_normal")
+            self.dense_layers.append( d )
+
+        self.logits_v = tf.squeeze(self.dense_layer(self.dense_layers[ -1 ], 1, 'logits_v', func=None), axis=[1])
         self.cost_v = 0.5 * tf.reduce_sum(tf.square(self.y_r - self.logits_v), axis=0)
 
-        self.logits_p = self.dense_layer(self.d8, self.num_actions, 'logits_p', func=None)
+        self.logits_p = self.dense_layer(self.dense_layers[ -1 ], self.num_actions, 'logits_p', func=None)
         if Config.USE_LOG_SOFTMAX:
             self.softmax_p = tf.nn.softmax(self.logits_p)
             self.log_softmax_p = tf.nn.log_softmax(self.logits_p)

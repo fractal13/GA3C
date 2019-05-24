@@ -37,9 +37,12 @@ class Config:
     # 1, 20, 400, 8000, 160000, ...
     #ENV_KWARGS = { 'count_mode': 'log', 'count_factor': 20 } 
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': 1 } 
-    MAX_SHUFFLE = 2
-    MAX_STEPS = 4
+    MAX_SHUFFLE = 1
+    MAX_STEPS = min( MAX_SHUFFLE+1, 26 )
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': MAX_SHUFFLE, 'max_steps': MAX_STEPS } 
+
+    NUMBER_OF_DENSE_NODES = 512
+    NUMBER_OF_DENSE_LAYERS = 16
 
     # Enable to see the trained agent in action
     PLAY_MODE = False
@@ -96,7 +99,7 @@ class Config:
     EPISODES = 20*400000
     ANNEALING_EPISODE_COUNT = 20*400000
     # Stop early if the rolling reward average reaches this level.
-    STOPPING_REWARD = 1.0 - ( (MAX_SHUFFLE-1) / MAX_STEPS )
+    STOPPING_REWARD = 1.0 - ( (MAX_SHUFFLE-1) / 30. )
 
     # Entropy regualrization hyper-parameter
     BETA_START = 0.01
