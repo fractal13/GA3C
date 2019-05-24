@@ -46,7 +46,7 @@ class Config:
     # Enable to train
     TRAIN_MODELS = True
     # Load old models. Throws if the model doesn't exist
-    LOAD_CHECKPOINT = True
+    LOAD_CHECKPOINT = False
     # If 0, the latest checkpoint is loaded
     LOAD_EPISODE = 0 
 
@@ -93,8 +93,8 @@ class Config:
     IMAGE_HEIGHT = 54
 
     # Total number of episodes and annealing frequency
-    EPISODES = 11*400000
-    ANNEALING_EPISODE_COUNT = 11*400000
+    EPISODES = 20*400000
+    ANNEALING_EPISODE_COUNT = 20*400000
     # Stop early if the rolling reward average reaches this level.
     STOPPING_REWARD = 1.0 - ( (MAX_SHUFFLE-1) / MAX_STEPS )
 
