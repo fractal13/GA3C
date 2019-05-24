@@ -82,14 +82,14 @@ class NetworkVP:
         nb_elements = flatten_input_shape[1] * flatten_input_shape[2] * flatten_input_shape[3]
 
         self.flat = tf.reshape(_input, shape=[-1, nb_elements._value])
-        self.d1 = self.dense_layer(self.flat, 256, 'dense1', func=tf.nn.softsign)
-        self.d2 = self.dense_layer(self.d1, 256, 'dense2', func=tf.nn.softsign)
-        self.d3 = self.dense_layer(self.d2, 256, 'dense3', func=tf.nn.softsign)
-        self.d4 = self.dense_layer(self.d3, 256, 'dense4', func=tf.nn.softsign)
-        self.d5 = self.dense_layer(self.d4, 256, 'dense5', func=tf.nn.softsign)
-        self.d6 = self.dense_layer(self.d5, 256, 'dense6', func=tf.nn.softsign)
-        self.d7 = self.dense_layer(self.d6, 256, 'dense7', func=tf.nn.softsign)
-        self.d8 = self.dense_layer(self.d7, 256, 'dense8', func=tf.nn.softsign)
+        self.d1 = self.dense_layer(self.flat, 256, 'dense1', func=tf.nn.softsign, initializer="glorot_normal")
+        self.d2 = self.dense_layer(self.d1, 256, 'dense2', func=tf.nn.softsign, initializer="glorot_normal")
+        self.d3 = self.dense_layer(self.d2, 256, 'dense3', func=tf.nn.softsign, initializer="glorot_normal")
+        self.d4 = self.dense_layer(self.d3, 256, 'dense4', func=tf.nn.softsign, initializer="glorot_normal")
+        self.d5 = self.dense_layer(self.d4, 256, 'dense5', func=tf.nn.softsign, initializer="glorot_normal")
+        self.d6 = self.dense_layer(self.d5, 256, 'dense6', func=tf.nn.softsign, initializer="glorot_normal")
+        self.d7 = self.dense_layer(self.d6, 256, 'dense7', func=tf.nn.softsign, initializer="glorot_normal")
+        self.d8 = self.dense_layer(self.d7, 256, 'dense8', func=tf.nn.softsign, initializer="glorot_normal")
 
         self.logits_v = tf.squeeze(self.dense_layer(self.d8, 1, 'logits_v', func=None), axis=[1])
         self.cost_v = 0.5 * tf.reduce_sum(tf.square(self.y_r - self.logits_v), axis=0)
@@ -182,12 +182,16 @@ class NetworkVP:
         self.summary_op = tf.summary.merge(summaries)
         self.log_writer = tf.summary.FileWriter("logs/%s" % self.model_name, self.sess.graph)
 
-    def dense_layer(self, input, out_dim, name, func=tf.nn.relu):
-        in_dim = input.get_shape().as_list()[-1]
-        d = 1.0 / np.sqrt(in_dim)
+    def dense_layer(self, input, out_dim, name, func=tf.nn.relu, initializer=""):
         with tf.variable_scope(name):
-            w_init = tf.random_uniform_initializer(-d, d)
-            b_init = tf.random_uniform_initializer(-d, d)
+            in_dim = input.get_shape().as_list()[-1]
+            if initializer == "":
+                d = 1.0 / np.sqrt(in_dim)
+                w_init = tf.random_uniform_initializer(-d, d)
+                b_init = tf.random_uniform_initializer(-d, d)
+            elif initializer == "glorot_normal":
+                w_init = tf.glorot_normal_initializer( )
+                b_init = tf.glorot_normal_initializer( )
             w = tf.get_variable('w', dtype=tf.float32, shape=[in_dim, out_dim], initializer=w_init)
             b = tf.get_variable('b', shape=[out_dim], initializer=b_init)
 
