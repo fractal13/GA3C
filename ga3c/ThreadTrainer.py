@@ -65,5 +65,5 @@ class ThreadTrainer(Thread):
             
             if Config.TRAIN_MODELS and batch_size > 0:
                 self.server.train_model(x__, r__, a__, self.id)
-        print( "ThreadTrainer finished" )
+        #print( "ThreadTrainer finished" )
         return

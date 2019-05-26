@@ -119,5 +119,5 @@ class ThreadDynamicAdjustment(Thread):
                     old_trainer_count, old_predictor_count, old_agent_count
 
             self.update_stats()
-        print( "ThreadDynamicAdjustment finished" )
+        #print( "ThreadDynamicAdjustment finished" )
         return

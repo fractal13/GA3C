@@ -135,5 +135,5 @@ class ProcessAgent(Process):
                 total_length += len(r_) + 1  # +1 for last frame that we drop
                 self.training_q.put((x_, r_, a_))
             self.episode_log_q.put((datetime.now(), total_reward, total_length))
-        print( "ProcessAgent finished" )
+        #print( "ProcessAgent finished" )
         return

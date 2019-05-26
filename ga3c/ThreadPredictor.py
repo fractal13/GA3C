@@ -72,5 +72,5 @@ class ThreadPredictor(Thread):
                 if ids[i] < len(self.server.agents):
                     self.server.agents[ids[i]].wait_q.put((p[i], v[i]))
                     
-        print( "ThreadPredictor finished" )
+        #print( "ThreadPredictor finished" )
         return

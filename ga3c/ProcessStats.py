@@ -76,7 +76,7 @@ class ProcessStats(Process):
                 try:
                     episode_time, reward, length = self.episode_log_q.get( block=True, timeout=1 )
                 except queueEmpty:
-                    print( "episode_log_q empty" )
+                    #print( "episode_log_q empty" )
                     continue
                 results_logger.write('%s %10.4f %d\n' % (episode_time.strftime("%Y-%m-%d %H:%M:%S"), reward, length))
                 results_logger.flush()
@@ -116,5 +116,5 @@ class ProcessStats(Process):
                            self.trainer_count.value, self.predictor_count.value, self.agent_count.value))
                     sys.stdout.flush()
                     
-            print( "ProcessStats finished", self.exit_flag.value )
+            #print( "ProcessStats finished", self.exit_flag.value )
         return
