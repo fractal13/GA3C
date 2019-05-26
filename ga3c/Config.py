@@ -67,7 +67,7 @@ class Config:
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': 1 } 
     MIN_SHUFFLE = 1
     MAX_SHUFFLE = 1
-    MAX_STEPS = min( MAX_SHUFFLE+1, 26 )
+    MAX_STEPS = 30 # min( MAX_SHUFFLE+2, 26 )
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': MAX_SHUFFLE, 'min_shuffle': MIN_SHUFFLE, 'max_steps': MAX_STEPS } 
 
     NUMBER_OF_DENSE_NODES = 512
