@@ -66,9 +66,10 @@ class Config:
     #ENV_KWARGS = { 'count_mode': 'log', 'count_factor': 20 } 
     ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': 1 } 
     MIN_SHUFFLE = 1
-    MAX_SHUFFLE = 1
+    MAX_SHUFFLE = 17
+    SHUFFLE_MODE = 'table' # 'constant'
     MAX_STEPS = 30 # min( MAX_SHUFFLE+2, 26 )
-    ENV_KWARGS = { 'count_mode': 'constant', 'count_factor': MAX_SHUFFLE, 'min_shuffle': MIN_SHUFFLE, 'max_steps': MAX_STEPS } 
+    ENV_KWARGS = { 'count_mode': SHUFFLE_MODE, 'count_factor': MAX_SHUFFLE, 'min_shuffle': MIN_SHUFFLE, 'max_steps': MAX_STEPS } 
 
     NUMBER_OF_DENSE_NODES = 512
     NUMBER_OF_DENSE_LAYERS = 16
@@ -128,7 +129,12 @@ class Config:
     EPISODES = 20*400000
     ANNEALING_EPISODE_COUNT = 20*400000
     # Stop early if the rolling reward average reaches this level.
-    STOPPING_REWARD = stopping_reward( MAX_SHUFFLE, step_penalty=-(1./30.), finish_reward=1.0 )
+    if SHUFFLE_MODE == 'constant':
+        STOPPING_REWARD = stopping_reward( MAX_SHUFFLE, step_penalty=-(1./30.), finish_reward=1.0 )
+    elif SHUFFLE_MODE == 'table':
+        STOPPING_REWARD = 1.0
+    else:
+        STOPPING_REWARD = 1.0
 
     # Entropy regualrization hyper-parameter
     BETA_START = 0.01
